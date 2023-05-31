@@ -17,3 +17,6 @@ abstract class CleaningProcedure(agent: Agent, environment: Environment) {
 
     println("End of simulation")
 }
+
+
+
