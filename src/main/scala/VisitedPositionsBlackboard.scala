@@ -6,7 +6,7 @@ import org.ai.agents.AgentPosition
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import scala.collection.mutable
 
-class AgentPositionsBlackboard {
+class VisitedPositionsBlackboard {
   private val positions = mutable.HashSet[AgentPosition]()
   private val reentrantReadWriteLock: ReentrantReadWriteLock = ReentrantReadWriteLock()
 

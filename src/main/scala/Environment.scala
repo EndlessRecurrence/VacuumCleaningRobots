@@ -1,14 +1,11 @@
 package org.ai.agents
 
 abstract class Environment {
-  protected var state: State
-
-  def updateState(a: Agent, action: Action): Unit =
-    state = action.execute(a, state)
+  protected var state: State = null
 
   def getPercept(a: Agent): Percept
 
-  def currentState(): State = state
+  def currentState(): State = this.state
   def setInitialState(state: State): Unit = this.state = state
-
+  def updateState(a: Agent, action: Action): Unit = this.state = action.execute(a, state)
 }

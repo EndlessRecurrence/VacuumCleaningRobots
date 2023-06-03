@@ -1,21 +1,27 @@
 package org.ai.agents
 
-abstract class CleaningProcedure(agent: Agent, environment: Environment) {
+import java.lang.Runnable
+import scala.util.control.Breaks.{break, breakable}
 
-  protected def isComplete: Boolean
+class CleaningProcedure(agent: VacuumAgent, environment: VacuumEnvironment) extends Thread {
 
-  def start(initialState: State): Unit =
-    environment.setInitialState(initialState)
-    environment.currentState().display()
+  private def isComplete: Boolean = true
 
+  override def run(): Unit =
     while (!isComplete) {
       val percept: Percept = environment.getPercept(agent)
       agent.see(percept)
-      val action: Action = agent.selectAction
-      environment.updateState(agent, action)
+      val actionOption: Option[Action] = agent.selectAction
+      actionOption match
+        case None => None
+        case Some(action) =>
+          environment.updateState(agent, action)
+          Thread.sleep(1000)
     }
 
-    println("End of simulation")
+    Thread.sleep(1000)
+    val agentId: Int = agent.getId
+    println(s"Agent $agentId finished the cleaning procedure.")
 }
 
 
