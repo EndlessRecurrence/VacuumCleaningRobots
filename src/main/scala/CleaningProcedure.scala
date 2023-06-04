@@ -9,8 +9,10 @@ class CleaningProcedure(agent: VacuumAgent, environment: VacuumEnvironment) exte
 
   override def run(): Unit =
     while (!isComplete) {
-      val percept: Percept = environment.getPercept(agent)
-      agent.see(percept)
+      val perceptOption: Option[Percept] = environment.getPercept(agent)
+      perceptOption match
+        case None => None
+        case Some(x) => agent.see(x.asInstanceOf[Option[VacuumPercept]])
       val actionOption: Option[Action] = agent.selectAction
       actionOption match
         case None => None

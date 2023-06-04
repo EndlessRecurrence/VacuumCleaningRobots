@@ -34,7 +34,9 @@ class VacuumState(rows: Int, columns: Int,
 
   override def display(): Unit = null
 
-  def isDirty(row: Int, column: Int): Boolean =
+  def isDirty(cellPosition: AgentPosition): Boolean =
+    val row = cellPosition.x
+    val column = cellPosition.y
     locks(row)(column).readLock().lock()
     val result: Boolean = map(row)(column).dirty
     locks(row)(column).readLock().unlock()
@@ -63,21 +65,21 @@ class VacuumState(rows: Int, columns: Int,
     map(row)(column).hasBeenVisited = true
     locks(row)(column).writeLock().unlock()
 
-  def moveAgent(agentId: Int, currentRow: Int, currentColumn: Int, nextRow: Int, nextColumn: Int): (Int, Int) =
+  def moveAgent(agentId: Int, currentPosition: AgentPosition, nextPosition: AgentPosition): AgentPosition =
     var moveable: Boolean = true
-    locks(currentRow)(currentColumn).writeLock().lock()
-    locks(nextRow)(nextColumn).writeLock().lock()
-    map(nextRow)(nextColumn).agentId != 0 match
+    locks(currentPosition.x)(currentPosition.y).writeLock().lock()
+    locks(nextPosition.x)(nextPosition.y).writeLock().lock()
+    map(nextPosition.x)(nextPosition.y).agentId != 0 match
       case true => moveable = false
       case false => {
-        map(currentRow)(currentColumn).agentId = 0
-        map(currentRow)(currentColumn).hasBeenVisited = true
-        map(nextRow)(nextColumn).agentId = agentId
-        map(nextRow)(nextColumn).hasBeenVisited = true
+        map(currentPosition.x)(currentPosition.y).agentId = 0
+        map(currentPosition.x)(currentPosition.y).hasBeenVisited = true
+        map(nextPosition.x)(nextPosition.y).agentId = agentId
+        map(nextPosition.x)(nextPosition.y).hasBeenVisited = true
       }
-    locks(nextRow)(nextColumn).writeLock().lock()
-    locks(currentRow)(currentColumn).writeLock().lock()
-    if (moveable) (nextRow, nextColumn) else (currentRow, currentColumn)
+    locks(nextPosition.x)(nextPosition.y).writeLock().unlock()
+    locks(currentPosition.x)(currentPosition.y).writeLock().unlock()
+    if (moveable) AgentPosition(nextPosition.x, nextPosition.y) else AgentPosition(currentPosition.x, currentPosition.y)
 
 }
 

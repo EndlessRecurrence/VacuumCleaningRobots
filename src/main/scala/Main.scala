@@ -8,15 +8,15 @@ object Main {
   private val percentageOfDirt: Double = 0.1
   private val agentCount: Int = 5
 
-  private def generateRandomAgentPositions(agentCount: Int): List[(Int, Int)] =
+  private def generateRandomAgentPositions(agentCount: Int): List[AgentPosition] =
     val randomGenerator = Random()
     (1 to agentCount)
-      .map(_ => (randomGenerator.between(0, rows-1), randomGenerator.between(0, columns-1)))
+      .map(_ => AgentPosition(randomGenerator.between(0, rows-1), randomGenerator.between(0, columns-1)))
       .toList
 
   def main(args: Array[String]): Unit =
     val visitedPositions: VisitedPositionsBlackboard = VisitedPositionsBlackboard()
-    val agentPositions: List[(Int, Int)] = this.generateRandomAgentPositions(agentCount)
+    val agentPositions: List[AgentPosition] = this.generateRandomAgentPositions(agentCount)
     val state: VacuumState = VacuumState(rows, columns, percentageOfDirt, agentCount)
     val environment: VacuumEnvironment = VacuumEnvironment(state)
     val cleaningProcedures: List[CleaningProcedure] =
