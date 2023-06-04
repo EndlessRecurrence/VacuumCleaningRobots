@@ -3,10 +3,10 @@ package org.ai.agents
 import scala.util.Random
 
 object Main {
-  private val rows: Int = 20
-  private val columns: Int = 20
+  private val rows: Int = 4
+  private val columns: Int = 4
   private val percentageOfDirt: Double = 0.1
-  private val agentCount: Int = 5
+  private val agentCount: Int = 2
 
   private def generateRandomAgentPositions(agentCount: Int): List[AgentPosition] =
     val randomGenerator = Random()

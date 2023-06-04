@@ -16,6 +16,9 @@ class VacuumAgent(agentId: Int,
   private val randomGenerator: Random = Random()
   visitedPositionsBlackboard.addPosition(position)
 
+  def dirtDetected_=(value: Boolean): Unit =
+    this.dirtDetected = value
+
   def getId: Int = agentId
 
   def hasStopped: Boolean = stopped

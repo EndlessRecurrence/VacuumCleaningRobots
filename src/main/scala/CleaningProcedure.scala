@@ -5,14 +5,14 @@ import scala.util.control.Breaks.{break, breakable}
 
 class CleaningProcedure(agent: VacuumAgent, environment: VacuumEnvironment) extends Thread {
 
-  private def isComplete: Boolean = true
+  private def isComplete: Boolean = agent.hasStopped
 
   override def run(): Unit =
     while (!isComplete) {
       val perceptOption: Option[Percept] = environment.getPercept(agent)
       perceptOption match
         case None => None
-        case Some(x) => agent.see(x.asInstanceOf[Option[VacuumPercept]])
+        case Some(x) => agent.see(Some(x.asInstanceOf[VacuumPercept]))
       val actionOption: Option[Action] = agent.selectAction
       actionOption match
         case None => None

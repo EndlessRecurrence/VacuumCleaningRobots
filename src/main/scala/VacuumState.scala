@@ -32,7 +32,7 @@ class VacuumState(rows: Int, columns: Int,
   private def initializeCleanedCellsCounters(): Unit =
     for (i <- 1 to agentCount) cellsCleanedByAgents.put(i, 0)
 
-  override def display(): Unit = null
+  override def display(): Unit = {}
 
   def isDirty(cellPosition: AgentPosition): Boolean =
     val row = cellPosition.x
@@ -43,27 +43,27 @@ class VacuumState(rows: Int, columns: Int,
     result
 
   private def displayStats(): Unit = this.synchronized  {
-    cellsCleanedByAgents.entrySet().stream()
+    val cellsCleaned: Long = cellsCleanedByAgents.entrySet().stream()
       .map(x => x.getValue)
       .count()
-      .pipe(x => println("Cells cleaned: $x"))
+    println(s"Cells cleaned: $cellsCleaned")
   }
 
-  def cleanSurface(agentId: Int, row: Int, column: Int): Unit =
-    locks(row)(column).writeLock().lock()
-    map(row)(column).dirty = false
+  def cleanSurface(agentId: Int, position: AgentPosition): Unit =
+    locks(position.x)(position.y).writeLock().lock()
+    map(position.x)(position.y).dirty = false
     cellsCleanedByAgents.put(agentId, cellsCleanedByAgents.get(agentId))
     displayStats()
-    locks(row)(column).writeLock().unlock()
+    locks(position.x)(position.y).writeLock().unlock()
 
-  def runAgentStartup(agentId: Int, row: Int, column: Int): Unit =
-    map(row)(column).agentId = agentId
+  def runAgentStartup(agentId: Int, position: AgentPosition): Unit =
+    map(position.x)(position.y).agentId = agentId
 
-  def turnOffAgent(row: Int, column: Int): Unit =
-    locks(row)(column).writeLock().lock()
-    map(row)(column).agentId = 0
-    map(row)(column).hasBeenVisited = true
-    locks(row)(column).writeLock().unlock()
+  def turnOffAgent(position: AgentPosition): Unit =
+    locks(position.x)(position.y).writeLock().lock()
+    map(position.x)(position.y).agentId = 0
+    map(position.x)(position.y).hasBeenVisited = true
+    locks(position.x)(position.y).writeLock().unlock()
 
   def moveAgent(agentId: Int, currentPosition: AgentPosition, nextPosition: AgentPosition): AgentPosition =
     var moveable: Boolean = true
@@ -71,12 +71,11 @@ class VacuumState(rows: Int, columns: Int,
     locks(nextPosition.x)(nextPosition.y).writeLock().lock()
     map(nextPosition.x)(nextPosition.y).agentId != 0 match
       case true => moveable = false
-      case false => {
+      case false =>
         map(currentPosition.x)(currentPosition.y).agentId = 0
         map(currentPosition.x)(currentPosition.y).hasBeenVisited = true
         map(nextPosition.x)(nextPosition.y).agentId = agentId
         map(nextPosition.x)(nextPosition.y).hasBeenVisited = true
-      }
     locks(nextPosition.x)(nextPosition.y).writeLock().unlock()
     locks(currentPosition.x)(currentPosition.y).writeLock().unlock()
     if (moveable) AgentPosition(nextPosition.x, nextPosition.y) else AgentPosition(currentPosition.x, currentPosition.y)
